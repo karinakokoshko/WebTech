@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Повна версія картки викладача</title>
+</head>
+<body>
+    <header>
+        <h1>Повна версія картки викладача</h1>
+    </header>
+    <main>
+        <article data-bgcolor="pink">
+            <h2>Квіт Сергій Миронович</h2>
+            <section>
+                <p><strong>Стать:</strong> Чоловіча</p>
+                <p><strong>Вік:</strong> 54</p>
+                <p><strong>Email:</strong> kvit.sergiy@email.com</p>
+                <p><strong>Телефон:</strong> +123456789</p>
+            </section>
+            <aside>
+                <p>Додаткова інформація: Ректор НаУКМА</p>
+                <p>Місце розташування:  
+                    <a href="https://www.google.com/maps/place/Kyiv" target="_blank">Переглянути на карті</a>
+                </p>
+            </aside>
+        </article>
+    </main>
+    <footer>
+        <p>2025 Академічна система</p>
+    </footer>
+    <script>
+        var articleElement = document.querySelector("article");
+        articleElement.style.backgroundColor = articleElement.getAttribute("data-bgcolor");
+    </script>
+</body>
+</html>
+
+
+
+
