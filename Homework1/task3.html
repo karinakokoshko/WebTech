@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Повна версія картки викладача</title>
+    <style>
+        article {
+            background-color: #FFC0CB;
+        }
+    </style>
 </head>
 <body>
+    <article data-bgcolor="#FFC0CB">
     <header>
         <h1>Повна версія картки викладача</h1>
     </header>
     <main>
-        <article data-bgcolor="pink">
             <h2>Квіт Сергій Миронович</h2>
             <section>
                 <p><strong>Стать:</strong> Чоловіча</p>
@@ -29,12 +34,9 @@
     <footer>
         <p>2025 Академічна система</p>
     </footer>
-    <script>
-        var articleElement = document.querySelector("article");
-        articleElement.style.backgroundColor = articleElement.getAttribute("data-bgcolor");
-    </script>
 </body>
 </html>
+
 
 
 
