@@ -1,0 +1,197 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const categoryButtons = document.querySelectorAll('.category-button');
+    const pizzaCards = document.querySelectorAll('.pizza-card');
+    const pizzaCountBadge = document.querySelector('.pizza-count-badge');
+    const headerPizzasLink = document.querySelector('.header-pizzas-link');
+
+    categoryButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            categoryButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            const filter = button.innerText.trim();
+            let visiblePizzas = 0;
+
+            pizzaCards.forEach(card => {
+                const type = card.querySelector('.pizza-type').innerText.trim();
+                const cardMatchesFilter = () => {
+                    if (filter === 'Усі') return true;
+                    if (filter === "М'ясні" && type === "М'ясна піца") return true;
+                    if (filter === 'З ананасами' && type === 'Піца з ананасами') return true;
+                    if (filter === 'З грибами' && type === 'З грибами') return true;
+                    if (filter === 'З морепродуктами' && type === 'З морепродуктами') return true;
+                    if (filter === 'Вега' && (type === 'Вега' || type === 'Вегетаріанська')) return true;
+                    return false;
+                };
+
+                if (cardMatchesFilter()) {
+                    card.style.display = 'flex';
+                    visiblePizzas++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            pizzaCountBadge.innerText = visiblePizzas;
+        });
+    });
+    let cart = [
+        {
+            id: 'BBQ-30',
+            name: 'BBQ',
+            image: 'images/pizza_2.jpg',
+            size: 30,
+            size_text: 'Мала',
+            weight: 460,
+            price: 139,
+            quantity: 4
+        },
+        {
+            id: 'Россо Густо-30',
+            name: 'Россо Густо',
+            image: 'images/pizza_4.jpg',
+            size: 30,
+            size_text: 'Мала',
+            weight: 400,
+            price: 189,
+            quantity: 1
+        },
+        {
+            id: 'Міксовий поло-40',
+            name: 'Міксовий поло',
+            image: 'images/pizza_1.jpg',
+            size: 40,
+            size_text: 'Велика',
+            weight: 780,
+            price: 179,
+            quantity: 1
+        }
+    ];
+    const orderItemsContainer = document.querySelector('.order-items');
+    const orderCountBadge = document.querySelector('.order-header .order-count-badge');
+    const totalPriceElement = document.querySelector('.total-price');
+    const clearOrderButton = document.querySelector('.clear-order-button');
+    const checkoutButton = document.querySelector('.checkout-button');
+    const buyButtons = document.querySelectorAll('.buy-button');
+
+    const updateCartView = () => {
+        orderItemsContainer.innerHTML = '';
+        if (cart.length === 0) {
+            orderItemsContainer.innerHTML = '<p style="text-align:center; color:#777;">Ваше замовлення порожнє</p>';
+        } else {
+             cart.forEach(item => {
+                const itemHtml = `
+                    <div class="order-item" data-id="${item.id}">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-details">
+                            <h4>${item.name} (${item.size_text})</h4>
+                            <div class="item-size-info">
+                                <span>Ø ${item.size}</span>
+                                <span class="weight">${item.weight}</span>
+                            </div>
+                            <div class="item-price-quantity">
+                                <span class="item-price">${item.price * item.quantity} <span class="currency">грн</span></span>
+                                <div class="quantity-controls">
+                                    <button class="quantity-btn minus" data-tooltip="Зменшити кількість">-</button>
+                                    <input type="text" value="${item.quantity}" class="quantity-input" readonly>
+                                    <button class="quantity-btn plus" data-tooltip="Збільшити кількість">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                orderItemsContainer.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+        // Оновлюємо загальну суму та кількість
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        orderCountBadge.innerText = totalItems;
+        totalPriceElement.innerHTML = `${totalPrice} <span class="currency">грн</span>`;
+        addQuantityListeners();
+    };
+    const addToCart = (pizza) => {
+        const existingItem = cart.find(item => item.id === pizza.id);
+        if (existingItem) {
+            existingItem.quantity++;
+        } else {
+            cart.push({ ...pizza, quantity: 1 });
+        }
+        updateCartView();
+    };
+    // Слухачі подій для кнопок "Купити"
+    buyButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const optionBlock = e.target.closest('.pizza-option-block');
+            const card = e.target.closest('.pizza-card');
+            const sizeElement = optionBlock.querySelector('.diameter');
+            const weightElement = optionBlock.querySelector('.weight');
+            const pizza = {
+                id: card.querySelector('h3').innerText.trim() + '-' + sizeElement.innerText.trim(),
+                name: card.querySelector('h3').innerText.trim(),
+                image: card.querySelector('img').src,
+                size: parseInt(sizeElement.innerText.replace('Ø', '').trim()),
+                size_text: parseInt(sizeElement.innerText.replace('Ø', '').trim()) === 30 ? 'Мала' : 'Велика',
+                weight: parseInt(weightElement.innerText.trim()),
+                price: parseInt(optionBlock.querySelector('.pizza-price-block').innerText.trim())
+            };
+            addToCart(pizza);
+        });
+    });
+    const increaseQuantity = (id) => {
+        const item = cart.find(item => item.id === id);
+        if (item) {
+            item.quantity++;
+        }
+        updateCartView();
+    };
+    const decreaseQuantity = (id) => {
+        const item = cart.find(item => item.id === id);
+        if (item) {
+            item.quantity--;
+            if (item.quantity === 0) {
+                cart = cart.filter(cartItem => cartItem.id !== id);
+            }
+        }
+        updateCartView();
+    };
+    const addQuantityListeners = () => {
+        document.querySelectorAll('.quantity-btn.plus').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.closest('.order-item').dataset.id;
+                increaseQuantity(id);
+            });
+        });
+        document.querySelectorAll('.quantity-btn.minus').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const id = e.target.closest('.order-item').dataset.id;
+                decreaseQuantity(id);
+            });
+        });
+    };
+    // Очищення кошика
+    clearOrderButton.addEventListener('click', () => {
+        cart = [];
+        updateCartView();
+    });
+    // Оформлення замовлення
+    checkoutButton.addEventListener('click', () => {
+        if (cart.length === 0) {
+            alert('Ваш кошик порожній. Будь ласка, додайте піцу, щоб зробити замовлення.');
+            return;
+        }
+        const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        console.log('Нове замовлення:', cart);
+        console.log('Загальна сума:', totalPrice, 'грн.');
+        alert(`Ваше замовлення на суму ${totalPrice} грн прийнято! Дякуємо, що обрали PIZZA KMA!`);
+        cart = [];
+        updateCartView();
+    });
+    if (headerPizzasLink) {
+    headerPizzasLink.addEventListener('click', (event) => {
+        const allPizzasButton = Array.from(categoryButtons).find(button => button.innerText.trim() === 'Усі');
+        if (allPizzasButton) {
+            allPizzasButton.click(); 
+        }
+    });
+}
+    updateCartView();
+});
